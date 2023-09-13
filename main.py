@@ -5,7 +5,10 @@ import math
 pygame.init()
 
 # julie wants to zoom in
+# place planet somewhere in system statically. onclick button, wait for input mouseclick grab x,y create object at the grabbed x,y
+# could seperate planets into 4 spheres that act as 1 when close together but can seperate and act seperately if gravity force is strong enough
 # add a reset method
+# add a slow time function
 
 WIDTH, HEIGHT = 1600, 1000 # originally at  800 800
 WIN = pygame.display.set_mode((WIDTH, HEIGHT)) #want to implement pygame.RESIZABLE but sim doesnt rescale itself to fit the new resolution
@@ -22,6 +25,7 @@ BABY_BLUE = (137, 207, 240)
 DARK_BLUE =  (32, 42, 68)
 BLACK = (0,0,0)
 FONT = pygame.font.SysFont("comic sans", 15)
+
 
 class Planet:
     AU = 149.6e6 * 1000
@@ -100,6 +104,8 @@ class Planet:
 def main():
     run = True
     clock = pygame.time.Clock()
+    frames = 0
+    
 
     sun = Planet(0, 0, 7.5, YELLOW, 1.98892 * 10**30, "Sun") #(0, 0, 30, YELLOW, 1.98892 * 10**30)
     sun.sun = True
@@ -157,16 +163,38 @@ def main():
         textRect = button_text.get_rect()
         textRect.center = ( (button_x+(button_w/2)), (button_y + (button_h/2)) )
         WIN.blit(button_text, textRect)
+    
+    def timeElapsedBox(frames):
+        if frames > 365:
+            days = frames % 365
+            years = frames // 365
+            timeText = FONT.render(f'Time Elapsed: {years} Years {days} Days', True, WHITE, DARK_GRAY)
+        else:
+            timeText = FONT.render(f'Time Elapsed: {frames} Days', True, WHITE, DARK_GRAY)
+        timeTextBox = timeText.get_rect()
+        timeTextBox.center = (WIDTH // 2, HEIGHT // 2 - 300)
+        WIN.blit(timeText, timeTextBox)
+
+    
+        
+
+
 
     while run:
         clock.tick(60)
         WIN.fill((0, 0, 0))
         
+        
+
         create_button("Black Hole", 50, 250, 100, 50, WHITE, YELLOW, black_hole)
         create_button("Star", 50, 190, 100, 50, WHITE, YELLOW, second_sun)
         create_button("Planet", 50, 130, 100, 50, WHITE, YELLOW, second_jupiter)
-        create_button("Choose an object to add to the solar system:", 50, 0, 350, 49, WHITE, WHITE, None)
         create_button("Quit", 50, 500, 100, 50, WHITE, YELLOW, pygame.QUIT)
+        
+        frames += 1
+        timeElapsedBox(frames)
+        
+
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
