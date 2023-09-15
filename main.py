@@ -25,6 +25,7 @@ BLACK = (0,0,0)
 FONT = pygame.font.SysFont("comic sans", 15)
 frames = 0
 pause = False
+place_active = False
 
 
 class Planet:
@@ -44,7 +45,7 @@ class Planet:
         self.sun = False
         self.distance_to_sun = 0
         self.orbit = [] #this is a list of x,y position values for each frame for each planet so we can draw the planet and calculate distance from other planets through the pixel/distance ratio
-                        #a problem with this is that it slows the program down after a while because how big the lists get. i could possibly use a splice function somewhere to delete points if len() is longer than an amount of frames
+                
         
         self.x_vel = 0
         self.y_vel = 0
@@ -134,7 +135,7 @@ def main():
     neptune.y_vel = -5.43 * 1000
     
     #   optional objects that user can choose to add to game by clicking the corresponding button
-    black_hole = Planet(15* Planet.AU, 20 * Planet.AU, 2, WHITE, 5* sun.mass, "Black Hole") # trying to change y pos to bottom of screen, not working for some reason
+    black_hole = Planet(15* Planet.AU, 20 * Planet.AU, 2, WHITE, 5* sun.mass, "Black Hole") 
     black_hole.y_vel = -6 * 1000
 
     second_sun = Planet(15* Planet.AU, 20 * Planet.AU, 7.5, YELLOW, 1.98892 * 10**30, "Sun") #(0, 0, 30, YELLOW, 1.98892 * 10**30)
@@ -142,68 +143,24 @@ def main():
 
     second_jupiter = Planet(15 * Planet.AU, 20* Planet.AU, 5, ORANGE, 1898.13 * 10**24, "Jupiter")
     second_jupiter.y_vel = -6 * 1000
+    
+    user_object =  Planet(
+                            5 * Planet.AU,
+                            5 * Planet.AU,
+                            3,
+                            WHITE,
+                            10 * sun.mass,
+                            "Custom"
+                        )
 
     #   main() iterates through this list of objects and updates each position. optional objects get entered here when clicked
     planets = [sun, earth, mars, mercury, venus, jupiter, saturn, uranus, neptune]
+
+    
+
+    
     
     #button that adds the object passed to the planets list, currently the objects come in from the bottom right. see optional objects
-    def add_planet_button(msg, button_x, button_y, button_w, button_h, inactive_color, active_color, add_planet = None):
-        mouse = pygame.mouse.get_pos()
-        click = pygame.mouse.get_pressed()
-
-        if button_x + button_w > mouse[0] > button_x and button_y + button_h > mouse[1] > button_y:
-            pygame.draw.rect(WIN, active_color, (button_x, button_y, button_w, button_h))
-
-            if click[0] == 1 and add_planet != None:
-                planets.append(add_planet)
-
-        else:
-            pygame.draw.rect(WIN, inactive_color, (button_x, button_y, button_w, button_h))
-
-        button_text = FONT.render(msg, True, BLACK)
-        textRect = button_text.get_rect()
-        textRect.center = ( (button_x+(button_w/2)), (button_y + (button_h/2)) )
-        WIN.blit(button_text, textRect)
-
-    #button to add object to a specific position within the simulation
-    def place_planet_button(msg, button_x, button_y, button_w, button_h, inactive_color, active_color):
-        mouse = pygame.mouse.get_pos()
-        click = pygame.mouse.get_pressed()
-
-        if button_x + button_w > mouse[0] > button_x and button_y + button_h > mouse[1] > button_y:
-            pygame.draw.rect(WIN, active_color, (button_x, button_y, button_w, button_h))
-
-            if click[0] == 1:
-                #need to pause game, ask for user to click a location, grab that click location and make a planet object with that position
-                WIN.fill(BLACK)
-                global pause
-                pause = True
-                
-                while pause:
-                    mouse = pygame.mouse.get_pos()
-                    click = pygame.mouse.get_pressed()
-                    for event in pygame.event.get():
-
-                        if event.type == pygame.QUIT:
-                            pygame.quit()
-                            quit()
-
-                    create_instruction_box("Click anywhere on screen to add object to click location", 250, 100)
-
-                    resume_button("Cancel", button_x, button_y + 60, button_w, button_h, RED, YELLOW)
-
-                    for planet in planets:
-                        planet.draw(WIN)
-                    pygame.display.update()
-                    clock.tick(15)  
-
-        else:
-            pygame.draw.rect(WIN, inactive_color, (button_x, button_y, button_w, button_h))
-
-        button_text = FONT.render(msg, True, BLACK)
-        textRect = button_text.get_rect()
-        textRect.center = ( (button_x+(button_w/2)), (button_y + (button_h/2)) )
-        WIN.blit(button_text, textRect)
 
     def reset_button(msg, button_x, button_y, button_w, button_h, inactive_color, active_color):
         mouse = pygame.mouse.get_pos()
@@ -272,9 +229,30 @@ def main():
                 neptune.y = 0
                 neptune.x_vel = 0
 
+                
+                black_hole.x_vel = 0
+                black_hole.y_vel = -6 * 1000
+                black_hole.x = 15* Planet.AU
+                black_hole.y = 20 * Planet.AU
+                black_hole.orbit = []
+
                 global frames
                 frames = 0
-                planets = [sun, earth, mars, mercury, venus, jupiter, saturn, uranus, neptune]
+                if black_hole in planets:
+                    planets.remove(black_hole)
+
+                if second_sun in planets:
+                    planets.remove(second_sun)
+
+                if second_jupiter in planets:
+                    planets.remove(second_jupiter)
+
+                if user_object in planets:
+                    user_object.orbit = []
+                    user_object.x_vel = 0
+                    user_object.y_vel = 0
+                    planets.remove(user_object)
+            
 
         else:
             pygame.draw.rect(WIN, inactive_color, (button_x, button_y, button_w, button_h))
@@ -283,6 +261,56 @@ def main():
         textRect = button_text.get_rect()
         textRect.center = ( (button_x+(button_w/2)), (button_y + (button_h/2)) )
         WIN.blit(button_text, textRect)
+
+    def add_planet_button(msg, button_x, button_y, button_w, button_h, inactive_color, active_color, add_planet = None):
+        mouse = pygame.mouse.get_pos()
+        click = pygame.mouse.get_pressed()
+
+        if button_x + button_w > mouse[0] > button_x and button_y + button_h > mouse[1] > button_y:
+            pygame.draw.rect(WIN, active_color, (button_x, button_y, button_w, button_h))
+
+            if click[0] == 1 and add_planet != None:
+                planets.append(add_planet)
+
+        else:
+            pygame.draw.rect(WIN, inactive_color, (button_x, button_y, button_w, button_h))
+
+        button_text = FONT.render(msg, True, BLACK)
+        textRect = button_text.get_rect()
+        textRect.center = ( (button_x+(button_w/2)), (button_y + (button_h/2)) )
+        WIN.blit(button_text, textRect)
+
+    #working but want to add several object if clicked again, currently updates object position
+    def place_planet_button(msg, button_x, button_y, button_w, button_h, inactive_color, active_color):
+        mouse = pygame.mouse.get_pos()
+        click = pygame.mouse.get_pressed()
+        global place_active
+
+        if (button_x + button_w > mouse[0] > button_x and button_y + button_h > mouse[1] > button_y) or place_active == True :
+            pygame.draw.rect(WIN, active_color, (button_x, button_y, button_w, button_h))
+
+            if click[0] == 1:
+                place_active = True
+                
+        else:
+            pygame.draw.rect(WIN, inactive_color, (button_x, button_y, button_w, button_h))
+
+        button_text = FONT.render(msg, True, BLACK)
+        textRect = button_text.get_rect()
+        textRect.center = ( (button_x+(button_w/2)), (button_y + (button_h/2)) )
+        WIN.blit(button_text, textRect)
+
+
+    def update_object():
+        global place_active
+        mouse = pygame.mouse.get_pos()
+        user_object.x = (mouse[0] - (WIDTH/2)) / Planet.SCALE
+        user_object.y = (mouse[1] - (HEIGHT/2)) / Planet.SCALE
+        planets.append(user_object)
+        place_active = False
+        #x = self.x * self.SCALE + WIDTH / 2        
+    #        x - width/2    /    self.SCALE = self.x
+
 
 
     def pause_button(msg, button_x, button_y, button_w, button_h, inactive_color, active_color):
@@ -324,7 +352,7 @@ def main():
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     pause = False
                             
-            resume_button("Resume", 100, 730, 100, 50, RED, YELLOW)
+            resume_button("Resume", 200, 730, 100, 50, RED, YELLOW)
 
             for planet in planets:
                 planet.draw(WIN)
@@ -411,8 +439,9 @@ def main():
         
         #text box
         create_instruction_box("Choose an option below. It will enter from bottom right", 250, 100)
+        create_instruction_box("Click \"place\" then click anywhere to add object", 250, 450)
 
-        global frames
+        global frames, place_active
         frames += 1
         timeElapsedBox(frames)
 
@@ -420,6 +449,9 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+
+            if event.type == pygame.MOUSEBUTTONDOWN and place_active == True:
+                        update_object()
             
                     
         
