@@ -25,6 +25,8 @@ DARK_BLUE =  (32, 42, 68)
 BLACK = (0,0,0)
 FONT = pygame.font.SysFont("comic sans", 15)
 
+PAUSE = False
+
 
 class Planet:
     AU = 149.6e6 * 1000
@@ -78,7 +80,7 @@ class Planet:
             self.distance_to_sun = distance
 
         force = self.G * self.mass * other.mass / distance**2 #  F =(GmM)/r**2
-        theta = math.atan2(distance_y, distance_x)
+        theta = math.atan2(distance_y, distance_x) #split the force vector into its x and y components
         force_x = math.cos(theta) * force
         force_y = math.sin(theta) * force
         return force_x, force_y
@@ -89,7 +91,7 @@ class Planet:
             if self == planet:
                 continue
 
-            fx, fy = self.attraction(planet)
+            fx, fy = self.attraction(planet) 
             total_fx += fx
             total_fy += fy
 
@@ -104,6 +106,7 @@ def main():
     run = True
     clock = pygame.time.Clock()
     frames = 0
+    
     
 
     sun = Planet(0, 0, 7.5, YELLOW, 1.98892 * 10**30, "Sun") #(0, 0, 30, YELLOW, 1.98892 * 10**30)
@@ -185,6 +188,24 @@ def main():
         textRect = button_text.get_rect()
         textRect.center = ( (button_x+(button_w/2)), (button_y + (button_h/2)) )
         WIN.blit(button_text, textRect)
+
+    def pause_button(msg, button_x, button_y, button_w, button_h, inactive_color, active_color):
+        mouse = pygame.mouse.get_pos()
+        click = pygame.mouse.get_pressed()
+
+        if button_x + button_w > mouse[0] > button_x and button_y + button_h > mouse[1] > button_y:
+            pygame.draw.rect(WIN, active_color, (button_x, button_y, button_w, button_h))
+
+            if click[0] == 1:
+                paused()
+
+        else:
+            pygame.draw.rect(WIN, inactive_color, (button_x, button_y, button_w, button_h))
+
+        button_text = FONT.render(msg, True, BLACK)
+        textRect = button_text.get_rect()
+        textRect.center = ( (button_x+(button_w/2)), (button_y + (button_h/2)) )
+        WIN.blit(button_text, textRect)
     
     def quit_button(msg, button_x, button_y, button_w, button_h, inactive_color, active_color):
         mouse = pygame.mouse.get_pos()
@@ -202,6 +223,30 @@ def main():
         textRect = button_text.get_rect()
         textRect.center = ( (button_x+(button_w/2)), (button_y + (button_h/2)) )
         WIN.blit(button_text, textRect)
+
+    #working but not showing sim while paused, not showing buttons
+    def paused():
+        WIN.fill(BLACK)
+        pause = True
+        
+
+
+        while pause:
+            for event in pygame.event.get():
+
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    quit()
+
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_p:
+                        pause = False
+
+            #gameDisplay.fill(white)
+            for planet in planets:
+                planet.draw(WIN)
+            pygame.display.update()
+            clock.tick(15)  
 
     
 
@@ -253,7 +298,9 @@ def main():
         #buttons
         add_planet_button("Black Hole", 50, 250, 100, 50, WHITE, YELLOW, black_hole)
         add_planet_button("Star", 50, 190, 100, 50, WHITE, YELLOW, second_sun)
-        add_planet_button("Planet", 50, 130, 100, 50, WHITE, YELLOW, second_jupiter)\
+        add_planet_button("Planet", 50, 130, 100, 50, WHITE, YELLOW, second_jupiter)
+
+        pause_button("Pause", 100, 750, 100, 50, RED, YELLOW)
         
         quit_button("Quit", 50, 850, 100, 50, WHITE, YELLOW)
         #reset_button("reset", 50, 560, 100, 50, WHITE, YELLOW)
@@ -264,10 +311,12 @@ def main():
         frames += 1
         timeElapsedBox(frames)
 
-        #stop running when closed
+        #event listeners
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+            
+                    
         
         #draw the planets updrated positions and velocidies every frame
         for planet in planets:
