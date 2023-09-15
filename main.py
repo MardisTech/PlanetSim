@@ -24,8 +24,7 @@ BABY_BLUE = (137, 207, 240)
 DARK_BLUE =  (32, 42, 68)
 BLACK = (0,0,0)
 FONT = pygame.font.SysFont("comic sans", 15)
-
-PAUSE = False
+frames = 0
 
 
 class Planet:
@@ -45,7 +44,7 @@ class Planet:
         self.sun = False
         self.distance_to_sun = 0
         self.orbit = [] #this is a list of x,y position values for each planet so we can draw a line at those positions
-                        #a problem with this is that it slows the program down after a while because how big he lists get
+                        #a problem with this is that it slows the program down after a while because how big the lists get
         
         self.x_vel = 0
         self.y_vel = 0
@@ -105,10 +104,8 @@ class Planet:
 def main():
     run = True
     clock = pygame.time.Clock()
-    frames = 0
     
     
-
     sun = Planet(0, 0, 7.5, YELLOW, 1.98892 * 10**30, "Sun") #(0, 0, 30, YELLOW, 1.98892 * 10**30)
     sun.sun = True
 
@@ -189,6 +186,88 @@ def main():
         textRect.center = ( (button_x+(button_w/2)), (button_y + (button_h/2)) )
         WIN.blit(button_text, textRect)
 
+
+
+    def reset_button(msg, button_x, button_y, button_w, button_h, inactive_color, active_color):
+        mouse = pygame.mouse.get_pos()
+        click = pygame.mouse.get_pressed()
+
+        if button_x + button_w > mouse[0] > button_x and button_y + button_h > mouse[1] > button_y:
+            pygame.draw.rect(WIN, active_color, (button_x, button_y, button_w, button_h))
+            if click[0] == 1:
+                sun.orbit = []
+                sun.x, sun.y = 0, 0
+                sun.x_vel = 0
+                sun.y_vel = 0
+
+                earth.y_vel = 29.783 * 1000
+                earth.orbit = []
+                earth.x = -1 * Planet.AU
+                earth.y = 0
+                earth.x_vel = 0
+                
+
+                mars.y_vel = 24.077 * 1000
+                mars.orbit = []
+                mars.x = -1.524 * Planet.AU
+                mars.y = 0
+                mars.x_vel = 0
+                
+
+                mercury.y_vel = -47.4 * 1000
+                mercury.orbit = []
+                mercury.x = 0.387 * Planet.AU
+                mercury.y = 0
+                mercury.x_vel = 0
+                
+
+                venus.y_vel = -35.02 * 1000
+                venus.orbit = []
+                venus.x = 0.723 * Planet.AU
+                venus.y = 0
+                venus.x_vel = 0
+                
+                
+                jupiter.y_vel = 13.07 * 1000
+                jupiter.orbit = []
+                jupiter.x = -5.2 * Planet.AU
+                jupiter.y = 0
+                jupiter.x_vel = 0
+                
+
+                saturn.y_vel = -9.68 * 1000
+                saturn.orbit = []
+                saturn.x = 9.5 * Planet.AU
+                saturn.y = 0
+                saturn.x_vel = 0
+                
+
+                uranus.y_vel = 6.8 * 1000
+                uranus.orbit = []
+                uranus.x = -19.8 * Planet.AU
+                uranus.y = 0
+                uranus.x_vel = 0
+                
+
+                neptune.y_vel = -5.43 * 1000
+                neptune.orbit = []
+                neptune.x = 30 * Planet.AU
+                neptune.y = 0
+                neptune.x_vel = 0
+
+                global frames
+                frames = 0
+                planets = [sun, earth, mars, mercury, venus, jupiter, saturn, uranus, neptune]
+
+        else:
+            pygame.draw.rect(WIN, inactive_color, (button_x, button_y, button_w, button_h))
+
+        button_text = FONT.render(msg, True, BLACK)
+        textRect = button_text.get_rect()
+        textRect.center = ( (button_x+(button_w/2)), (button_y + (button_h/2)) )
+        WIN.blit(button_text, textRect)
+
+
     def pause_button(msg, button_x, button_y, button_w, button_h, inactive_color, active_color):
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
@@ -199,6 +278,20 @@ def main():
             if click[0] == 1:
                 paused()
 
+        else:
+            pygame.draw.rect(WIN, inactive_color, (button_x, button_y, button_w, button_h))
+
+        button_text = FONT.render(msg, True, BLACK)
+        textRect = button_text.get_rect()
+        textRect.center = ( (button_x+(button_w/2)), (button_y + (button_h/2)) )
+        WIN.blit(button_text, textRect)
+
+    def resume_button(msg, button_x, button_y, button_w, button_h, inactive_color, active_color):
+        mouse = pygame.mouse.get_pos()
+        click = pygame.mouse.get_pressed()
+
+        if button_x + button_w > mouse[0] > button_x and button_y + button_h > mouse[1] > button_y:
+            pygame.draw.rect(WIN, active_color, (button_x, button_y, button_w, button_h))
         else:
             pygame.draw.rect(WIN, inactive_color, (button_x, button_y, button_w, button_h))
 
@@ -224,14 +317,14 @@ def main():
         textRect.center = ( (button_x+(button_w/2)), (button_y + (button_h/2)) )
         WIN.blit(button_text, textRect)
 
-    #working but not showing sim while paused, not showing buttons
+    
     def paused():
         WIN.fill(BLACK)
         pause = True
         
-
-
         while pause:
+            mouse = pygame.mouse.get_pos()
+            click = pygame.mouse.get_pressed()
             for event in pygame.event.get():
 
                 if event.type == pygame.QUIT:
@@ -239,36 +332,21 @@ def main():
                     quit()
 
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_p:
+                    if (event.key == pygame.K_p):
                         pause = False
 
-            #gameDisplay.fill(white)
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    pause = False
+                            
+            resume_button("Resume", 100, 730, 100, 50, RED, YELLOW)
+
             for planet in planets:
                 planet.draw(WIN)
+            timeElapsedBox(frames)
             pygame.display.update()
             clock.tick(15)  
 
-    
 
-    #work in progress
-    def reset_button(msg, button_x, button_y, button_w, button_h, inactive_color, active_color):
-        mouse = pygame.mouse.get_pos()
-        click = pygame.mouse.get_pressed()
-
-        if button_x + button_w > mouse[0] > button_x and button_y + button_h > mouse[1] > button_y:
-            pygame.draw.rect(WIN, active_color, (button_x, button_y, button_w, button_h))
-
-            if click[0] == 1:
-                #calling main() causes a freeze
-                return
-        
-        else:
-            pygame.draw.rect(WIN, inactive_color, (button_x, button_y, button_w, button_h))
-        
-        button_text = FONT.render(msg, True, BLACK)
-        textRect = button_text.get_rect()
-        textRect.center = ( (button_x+(button_w/2)), (button_y + (button_h/2)) )
-        WIN.blit(button_text, textRect)
     
     #takes in the number of frames generated since start and shows the simulated time that has passed. 1 frame = 1 day
     def timeElapsedBox(frames):
@@ -300,14 +378,14 @@ def main():
         add_planet_button("Star", 50, 190, 100, 50, WHITE, YELLOW, second_sun)
         add_planet_button("Planet", 50, 130, 100, 50, WHITE, YELLOW, second_jupiter)
 
-        pause_button("Pause", 100, 750, 100, 50, RED, YELLOW)
+        pause_button("Pause", 100, 730, 100, 50, YELLOW, RED)
         
+        reset_button("Reset", 50, 790, 100, 50, RED, RED)
         quit_button("Quit", 50, 850, 100, 50, WHITE, YELLOW)
-        #reset_button("reset", 50, 560, 100, 50, WHITE, YELLOW)
         
         #text box
         create_instruction_box("Choose an option below. It will enter from bottom right", 250, 100)
-
+        global frames
         frames += 1
         timeElapsedBox(frames)
 
