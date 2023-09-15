@@ -6,8 +6,7 @@ pygame.init()
 
 # julie wants to zoom in
 # place planet somewhere in system statically. onclick button, wait for input mouseclick grab x,y create object at the grabbed x,y
-# still working on the reset button
-# add a slow time button
+# add a slow or fastforward time option
 
 WIDTH, HEIGHT = 1600, 1000 # originally at  800 800
 WIN = pygame.display.set_mode((WIDTH, HEIGHT)) #want to implement pygame.RESIZABLE but sim doesnt rescale itself to fit the new resolution
@@ -25,6 +24,7 @@ DARK_BLUE =  (32, 42, 68)
 BLACK = (0,0,0)
 FONT = pygame.font.SysFont("comic sans", 15)
 frames = 0
+pause = False
 
 
 class Planet:
@@ -43,8 +43,8 @@ class Planet:
 
         self.sun = False
         self.distance_to_sun = 0
-        self.orbit = [] #this is a list of x,y position values for each planet so we can draw a line at those positions
-                        #a problem with this is that it slows the program down after a while because how big the lists get
+        self.orbit = [] #this is a list of x,y position values for each frame for each planet so we can draw the planet and calculate distance from other planets through the pixel/distance ratio
+                        #a problem with this is that it slows the program down after a while because how big the lists get. i could possibly use a splice function somewhere to delete points if len() is longer than an amount of frames
         
         self.x_vel = 0
         self.y_vel = 0
@@ -166,17 +166,36 @@ def main():
         WIN.blit(button_text, textRect)
 
     #button to add object to a specific position within the simulation
-    def add_planet_location(msg, button_x, button_y, button_w, button_h, inactive_color, active_color, add_planet = None):
+    def place_planet_button(msg, button_x, button_y, button_w, button_h, inactive_color, active_color):
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
 
         if button_x + button_w > mouse[0] > button_x and button_y + button_h > mouse[1] > button_y:
             pygame.draw.rect(WIN, active_color, (button_x, button_y, button_w, button_h))
 
-            if click[0] == 1 and add_planet != None:
+            if click[0] == 1:
                 #need to pause game, ask for user to click a location, grab that click location and make a planet object with that position
-                pygame.time.delay
-                planets.append(add_planet)
+                WIN.fill(BLACK)
+                global pause
+                pause = True
+                
+                while pause:
+                    mouse = pygame.mouse.get_pos()
+                    click = pygame.mouse.get_pressed()
+                    for event in pygame.event.get():
+
+                        if event.type == pygame.QUIT:
+                            pygame.quit()
+                            quit()
+
+                    create_instruction_box("Click anywhere on screen to add object to click location", 250, 100)
+
+                    resume_button("Cancel", button_x, button_y + 60, button_w, button_h, RED, YELLOW)
+
+                    for planet in planets:
+                        planet.draw(WIN)
+                    pygame.display.update()
+                    clock.tick(15)  
 
         else:
             pygame.draw.rect(WIN, inactive_color, (button_x, button_y, button_w, button_h))
@@ -185,8 +204,6 @@ def main():
         textRect = button_text.get_rect()
         textRect.center = ( (button_x+(button_w/2)), (button_y + (button_h/2)) )
         WIN.blit(button_text, textRect)
-
-
 
     def reset_button(msg, button_x, button_y, button_w, button_h, inactive_color, active_color):
         mouse = pygame.mouse.get_pos()
@@ -226,7 +243,7 @@ def main():
                 venus.x = 0.723 * Planet.AU
                 venus.y = 0
                 venus.x_vel = 0
-                
+    
                 
                 jupiter.y_vel = 13.07 * 1000
                 jupiter.orbit = []
@@ -286,40 +303,9 @@ def main():
         textRect.center = ( (button_x+(button_w/2)), (button_y + (button_h/2)) )
         WIN.blit(button_text, textRect)
 
-    def resume_button(msg, button_x, button_y, button_w, button_h, inactive_color, active_color):
-        mouse = pygame.mouse.get_pos()
-        click = pygame.mouse.get_pressed()
-
-        if button_x + button_w > mouse[0] > button_x and button_y + button_h > mouse[1] > button_y:
-            pygame.draw.rect(WIN, active_color, (button_x, button_y, button_w, button_h))
-        else:
-            pygame.draw.rect(WIN, inactive_color, (button_x, button_y, button_w, button_h))
-
-        button_text = FONT.render(msg, True, BLACK)
-        textRect = button_text.get_rect()
-        textRect.center = ( (button_x+(button_w/2)), (button_y + (button_h/2)) )
-        WIN.blit(button_text, textRect)
-    
-    def quit_button(msg, button_x, button_y, button_w, button_h, inactive_color, active_color):
-        mouse = pygame.mouse.get_pos()
-        click = pygame.mouse.get_pressed()
-
-        if button_x + button_w > mouse[0] > button_x and button_y + button_h > mouse[1] > button_y:
-            pygame.draw.rect(WIN, active_color, (button_x, button_y, button_w, button_h))
-
-            if click[0] == 1:
-                pygame.quit()
-        else:
-            pygame.draw.rect(WIN, inactive_color, (button_x, button_y, button_w, button_h))
-
-        button_text = FONT.render(msg, True, BLACK)
-        textRect = button_text.get_rect()
-        textRect.center = ( (button_x+(button_w/2)), (button_y + (button_h/2)) )
-        WIN.blit(button_text, textRect)
-
-    
     def paused():
         WIN.fill(BLACK)
+        global pause
         pause = True
         
         while pause:
@@ -346,6 +332,45 @@ def main():
             pygame.display.update()
             clock.tick(15)  
 
+
+    def resume_button(msg, button_x, button_y, button_w, button_h, inactive_color, active_color):
+        mouse = pygame.mouse.get_pos()
+        click = pygame.mouse.get_pressed()
+
+
+        if button_x + button_w > mouse[0] > button_x and button_y + button_h > mouse[1] > button_y:
+            pygame.draw.rect(WIN, active_color, (button_x, button_y, button_w, button_h))
+            if click[0] == 1:
+                global pause
+                pause = False
+
+        else:
+            pygame.draw.rect(WIN, inactive_color, (button_x, button_y, button_w, button_h))
+
+        button_text = FONT.render(msg, True, BLACK)
+        textRect = button_text.get_rect()
+        textRect.center = ( (button_x+(button_w/2)), (button_y + (button_h/2)) )
+        WIN.blit(button_text, textRect)
+    
+    def quit_button(msg, button_x, button_y, button_w, button_h, inactive_color, active_color):
+        mouse = pygame.mouse.get_pos()
+        click = pygame.mouse.get_pressed()
+
+        if button_x + button_w > mouse[0] > button_x and button_y + button_h > mouse[1] > button_y:
+            pygame.draw.rect(WIN, active_color, (button_x, button_y, button_w, button_h))
+
+            if click[0] == 1:
+                pygame.quit()
+        else:
+            pygame.draw.rect(WIN, inactive_color, (button_x, button_y, button_w, button_h))
+
+        button_text = FONT.render(msg, True, BLACK)
+        textRect = button_text.get_rect()
+        textRect.center = ( (button_x+(button_w/2)), (button_y + (button_h/2)) )
+        WIN.blit(button_text, textRect)
+
+    
+    
 
     
     #takes in the number of frames generated since start and shows the simulated time that has passed. 1 frame = 1 day
@@ -377,6 +402,7 @@ def main():
         add_planet_button("Black Hole", 50, 250, 100, 50, WHITE, YELLOW, black_hole)
         add_planet_button("Star", 50, 190, 100, 50, WHITE, YELLOW, second_sun)
         add_planet_button("Planet", 50, 130, 100, 50, WHITE, YELLOW, second_jupiter)
+        place_planet_button("Place", 50, 450, 100, 50, WHITE, YELLOW)
 
         pause_button("Pause", 100, 730, 100, 50, YELLOW, RED)
         
@@ -385,6 +411,7 @@ def main():
         
         #text box
         create_instruction_box("Choose an option below. It will enter from bottom right", 250, 100)
+
         global frames
         frames += 1
         timeElapsedBox(frames)
