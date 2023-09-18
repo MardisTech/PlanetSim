@@ -5,8 +5,8 @@ import math
 pygame.init()
 
 # julie wants to zoom in
-# place planet somewhere in system statically. onclick button, wait for input mouseclick grab x,y create object at the grabbed x,y
-# add a slow or fastforward time option
+# add planet info box - user will be able to inspect an object to see its velocity and other props
+# add a slow or fastforward frames/sim option, possibly a rewind option that draws from reversed list of orbit
 
 WIDTH, HEIGHT = 1600, 1000 # originally at  800 800
 WIN = pygame.display.set_mode((WIDTH, HEIGHT)) #want to implement pygame.RESIZABLE but sim doesnt rescale itself to fit the new resolution
@@ -156,12 +156,6 @@ def main():
     #   main() iterates through this list of objects and updates each position. optional objects get entered here when clicked
     planets = [sun, earth, mars, mercury, venus, jupiter, saturn, uranus, neptune]
 
-    
-
-    
-    
-    #button that adds the object passed to the planets list, currently the objects come in from the bottom right. see optional objects
-
     def reset_button(msg, button_x, button_y, button_w, button_h, inactive_color, active_color):
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
@@ -230,21 +224,32 @@ def main():
                 neptune.x_vel = 0
 
                 
-                black_hole.x_vel = 0
-                black_hole.y_vel = -6 * 1000
-                black_hole.x = 15* Planet.AU
-                black_hole.y = 20 * Planet.AU
-                black_hole.orbit = []
+                
 
                 global frames
                 frames = 0
                 if black_hole in planets:
+                    black_hole.x_vel = 0
+                    black_hole.y_vel = -6 * 1000
+                    black_hole.x = 15* Planet.AU
+                    black_hole.y = 20 * Planet.AU
+                    black_hole.orbit = []
                     planets.remove(black_hole)
 
                 if second_sun in planets:
+                    second_sun.x_vel = 0
+                    second_sun.y_vel = -6 * 1000
+                    second_sun.x = 15* Planet.AU
+                    second_sun.y = 20 * Planet.AU
+                    second_sun.orbit = []
                     planets.remove(second_sun)
 
                 if second_jupiter in planets:
+                    second_jupiter.x_vel = 0
+                    second_jupiter.y_vel = -6 * 1000
+                    second_jupiter.x = 15* Planet.AU
+                    second_jupiter.y = 20 * Planet.AU
+                    second_jupiter.orbit = []
                     planets.remove(second_jupiter)
 
                 if user_object in planets:
@@ -300,7 +305,7 @@ def main():
         textRect.center = ( (button_x+(button_w/2)), (button_y + (button_h/2)) )
         WIN.blit(button_text, textRect)
 
-
+    #update user object
     def update_object():
         global place_active
         mouse = pygame.mouse.get_pos()
