@@ -5,6 +5,8 @@ import math
 pygame.init()
 
 # julie wants to zoom in
+# add custom object input for place button
+# look into hooking in nasa API for real initial positions when launched instead of initializing on x axis
 # add planet info box - user will be able to inspect an object to see its velocity and other props
 # add a slow or fastforward frames/sim option, possibly a rewind option that draws from reversed list of orbit
 
@@ -223,9 +225,6 @@ def main():
                 neptune.y = 0
                 neptune.x_vel = 0
 
-                
-                
-
                 global frames
                 frames = 0
                 if black_hole in planets:
@@ -317,7 +316,6 @@ def main():
     #        x - width/2    /    self.SCALE = self.x
 
 
-
     def pause_button(msg, button_x, button_y, button_w, button_h, inactive_color, active_color):
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
@@ -402,8 +400,6 @@ def main():
         textRect.center = ( (button_x+(button_w/2)), (button_y + (button_h/2)) )
         WIN.blit(button_text, textRect)
 
-    
-    
 
     
     #takes in the number of frames generated since start and shows the simulated time that has passed. 1 frame = 1 day
@@ -435,7 +431,7 @@ def main():
         add_planet_button("Black Hole", 50, 250, 100, 50, WHITE, YELLOW, black_hole)
         add_planet_button("Star", 50, 190, 100, 50, WHITE, YELLOW, second_sun)
         add_planet_button("Planet", 50, 130, 100, 50, WHITE, YELLOW, second_jupiter)
-        place_planet_button("Place", 50, 450, 100, 50, WHITE, YELLOW)
+        place_planet_button("Place BH", 50, 450, 100, 50, WHITE, YELLOW)
 
         pause_button("Pause", 100, 730, 100, 50, YELLOW, RED)
         
@@ -443,8 +439,9 @@ def main():
         quit_button("Quit", 50, 850, 100, 50, WHITE, YELLOW)
         
         #text box
-        create_instruction_box("Choose an option below. It will enter from bottom right", 250, 100)
-        create_instruction_box("Click \"place\" then click anywhere to add object", 250, 450)
+        create_instruction_box("Choose an option below. It will enter from bottom right", 225, 100)
+        create_instruction_box("----- OR ------", 100, 375)
+        create_instruction_box("Click \"Place BH\" then click anywhere on screen", 210, 425)
 
         global frames, place_active
         frames += 1
