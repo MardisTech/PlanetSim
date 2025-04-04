@@ -12,6 +12,7 @@ dependencies = [
 ]
 
 [tool.poetry]
+package-mode = false
 packages = [{include = "sol_sys"}]
 
 
