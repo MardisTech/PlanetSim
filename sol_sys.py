@@ -29,6 +29,14 @@ BABY_BLUE = (137, 207, 240)
 DARK_BLUE = (32, 42, 68)
 BLACK = (0, 0, 0)
 FONT = pygame.font.SysFont("comic sans", 15)
+
+BUTTON_WIDTH_RATIO, BUTTON_HEIGHT_RATIO = 1/15, 1/30
+BUTTON_WIDTH, BUTTON_HEIGHT = (WIDTH * BUTTON_WIDTH_RATIO), (WIDTH * BUTTON_HEIGHT_RATIO)
+
+current_window_w, current_window_h = WIDTH, HEIGHT
+SCREEN_CHANGE_RATIO_W, SCREEN_CHANGE_RATIO_H = 1, 1
+
+
 frames = 0
 pause = False
 place_active = False
@@ -512,25 +520,33 @@ def main():
         clock.tick(60)
         WIN.fill((0, 0, 0))
 
-        # buttons
-        add_planet_button("Black Hole", 50, 250, 100, 50, WHITE, YELLOW, black_hole)
-        add_planet_button("Star", 50, 190, 100, 50, WHITE, YELLOW, second_sun)
-        add_planet_button("Planet", 50, 130, 100, 50, WHITE, YELLOW, second_jupiter)
-        place_planet_button("Place BH", 50, 450, 100, 50, WHITE, YELLOW)
-
-        pause_button("Pause", 100, 730, 100, 50, YELLOW, RED)
-
-        reset_button("Reset", 50, 790, 100, 50, RED, RED)
-        quit_button("Quit", 50, 850, 100, 50, WHITE, YELLOW)
+        global BUTTON_WIDTH, BUTTON_HEIGHT, current_window_w, current_window_h, SCREEN_CHANGE_RATIO_W, SCREEN_CHANGE_RATIO_H
 
         # text box
         create_instruction_box(
-            "Choose an option below. It will enter from bottom right", 225, 100
+            "Interstellar Visitor", 100 * SCREEN_CHANGE_RATIO_W, 80 * SCREEN_CHANGE_RATIO_H
         )
-        create_instruction_box("----- OR ------", 100, 375)
+
+        # buttons
+        add_planet_button("Planet", 25 * SCREEN_CHANGE_RATIO_W, 130 * SCREEN_CHANGE_RATIO_H, BUTTON_WIDTH, BUTTON_HEIGHT, WHITE, YELLOW, second_jupiter)
+        add_planet_button("Star", 25 * SCREEN_CHANGE_RATIO_W, 190 * SCREEN_CHANGE_RATIO_H, BUTTON_WIDTH, BUTTON_HEIGHT, WHITE, YELLOW, second_sun)
+        add_planet_button("Black Hole", 25 * SCREEN_CHANGE_RATIO_W, 250 * SCREEN_CHANGE_RATIO_H, BUTTON_WIDTH, BUTTON_HEIGHT, WHITE, YELLOW, black_hole)
+        
+
+
+        
         create_instruction_box(
-            'Click "Place BH" then click anywhere on screen', 210, 425
+            'Point and Click', 100 * SCREEN_CHANGE_RATIO_W, 400 * SCREEN_CHANGE_RATIO_H
         )
+
+        place_planet_button("Place BH", 25 * SCREEN_CHANGE_RATIO_W, 450 * SCREEN_CHANGE_RATIO_H, BUTTON_WIDTH, BUTTON_HEIGHT, WHITE, YELLOW)
+
+        pause_button("Pause", 25 * SCREEN_CHANGE_RATIO_W, 730 * SCREEN_CHANGE_RATIO_H, BUTTON_WIDTH, BUTTON_HEIGHT, YELLOW, RED)
+        reset_button("Reset", 25 * SCREEN_CHANGE_RATIO_W, 790 * SCREEN_CHANGE_RATIO_H, BUTTON_WIDTH, BUTTON_HEIGHT, RED, RED)
+        quit_button("Quit", 25 * SCREEN_CHANGE_RATIO_W, 850 * SCREEN_CHANGE_RATIO_H, BUTTON_WIDTH, BUTTON_HEIGHT, WHITE, YELLOW)
+
+
+
 
         global frames, place_active
         frames += 1
@@ -543,6 +559,21 @@ def main():
 
             if event.type == pygame.MOUSEBUTTONDOWN and place_active == True:
                 update_object()
+
+            if event.type == pygame.VIDEORESIZE:
+                current_window_w, current_window_h = pygame.display.get_surface().get_size()
+
+                BUTTON_WIDTH = current_window_w * BUTTON_WIDTH_RATIO
+
+                BUTTON_HEIGHT = current_window_h * BUTTON_HEIGHT_RATIO
+
+                SCREEN_CHANGE_RATIO_W = current_window_w / WIDTH
+
+                SCREEN_CHANGE_RATIO_H = current_window_h / HEIGHT
+
+
+
+
 
         # draw the planets updrated positions and velocidies every frame
         for planet in planets:
