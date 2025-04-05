@@ -12,13 +12,13 @@ pygame.init()
 # add a slow or fastforward frames/sim option, possibly a rewind option that draws from reversed list of orbit
 # add acceleration vection arrow to see orbit disturbance better!
 
-WIDTH, HEIGHT = 1600, 1000  # originally at  800 800
+WIDTH, HEIGHT = 1600, 1000  # pygame.display.set_mode((width,height),RESIZABLE)
 WIN = pygame.display.set_mode(
-    (WIDTH, HEIGHT)
+    (WIDTH, HEIGHT), flags=pygame.RESIZABLE
 )  # want to implement pygame.RESIZABLE but sim doesnt rescale itself to fit the new resolution
 pygame.display.set_caption("Planet Orbits Simulation (To Scale)")
 
-WHITE = (255, 255, 255)
+WHITE =(255, 255, 255)
 YELLOW = (255, 255, 0)
 BLUE = (100, 149, 237)
 RED = (255, 0, 0)
