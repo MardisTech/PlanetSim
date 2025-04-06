@@ -1,5 +1,3 @@
-from ctypes.wintypes import POINT
-from turtle import width
 import pygame
 import math
 
@@ -10,12 +8,13 @@ pygame.init()
 # look into hooking in nasa API for real initial positions when launched instead of initializing on x axis
 # add planet info box - user will be able to inspect an object to see its velocity and other props
 # add a slow or fastforward frames/sim option, possibly a rewind option that draws from reversed list of orbit
-# add acceleration vection arrow to see orbit disturbance better!
+# add acceleration vector arrow to see orbit disturbance better!
+# Should I zoom in?
 
 WIDTH, HEIGHT = 1600, 1000  # pygame.display.set_mode((width,height),RESIZABLE)
 WIN = pygame.display.set_mode(
     (WIDTH, HEIGHT), flags=pygame.RESIZABLE
-)  # want to implement pygame.RESIZABLE but sim doesnt rescale itself to fit the new resolution
+)  
 pygame.display.set_caption("Planet Orbits Simulation (To Scale)")
 
 WHITE =(255, 255, 255)
@@ -36,19 +35,20 @@ BUTTON_WIDTH, BUTTON_HEIGHT = (WIDTH * BUTTON_WIDTH_RATIO), (WIDTH * BUTTON_HEIG
 current_window_w, current_window_h = WIDTH, HEIGHT
 SCREEN_CHANGE_RATIO_W, SCREEN_CHANGE_RATIO_H = 1, 1
 
-
 frames = 0
 pause = False
 place_active = False
 
+TIMESTEP = (
+        3600 * 24
+    )  # the difference in time betweent frames. Since we want each frame to represent one day, we will use the amount of seconds in a day
 
 class Planet:
     AU = 149.6e6 * 1000
     G = 6.67428e-11
     SCALE = 25 / AU  # 1 AU = 100 PIXELS @  250 / AU
-    TIMESTEP = (
-        3600 * 24
-    )  # 1 DAY IN SECONDS, each frame update will represent 1 day of movement in orbit
+
+    global TIMESTEP
 
     def __init__(self, x, y, radius, color, mass, name):
         self.x = x
@@ -57,15 +57,47 @@ class Planet:
         self.color = color
         self.mass = mass
         self.name = name
-
+        self.TIMESTEP = TIMESTEP
         self.sun = False
         self.distance_to_sun = 0
+        self.x_vel = 0
+        self.y_vel = 0
         self.orbit = (
             []
         )  # this is a list of x,y position values for each frame for each planet so we can draw the planet and calculate distance from other planets through the pixel/distance ratio
 
-        self.x_vel = 0
-        self.y_vel = 0
+        self.x0 = x
+        self.y0 = y
+        self.radius0 = radius
+        self.color0 = color
+        self.mass0 = mass
+        self.name0 = name
+        self.TIMESTEP0 = TIMESTEP
+        self.sun0 = False
+        self.distance_to_sun0 = 0
+        self.x_vel0 = 0 # need to add a initial velocity parameter for object
+        self.y_vel0 = 0
+        self.orbit0 = (
+            []
+        )
+
+    def reset(self):
+        self.x = self.x0
+        self.y = self.y0
+        self.radius = self.radius0
+        self.color = self.color0
+        self.mass = self.mass0
+        self.name = self.name0
+        self.TIMESTEP = self.TIMESTEP0
+        self.sun = self.sun0
+        self.distance_to_sun = self.distance_to_sun0
+        self.x_vel = self.x_vel0
+        self.y_vel = self.y_vel0
+        self.orbit = self.orbit0
+
+    def update_timestep(self, new_timestep):
+        self.TIMESTEP = new_timestep
+
 
     def draw(self, win):
         x = (
@@ -135,10 +167,10 @@ class Planet:
         self.y += self.y_vel * self.TIMESTEP
         self.orbit.append((self.x, self.y))
 
-
 def main():
     run = True
     clock = pygame.time.Clock()
+    
 
     sun = Planet(
         0, 0, 7.5, YELLOW, 1.98892 * 10**30, "Sun"
@@ -214,7 +246,9 @@ def main():
                 WIN, active_color, (button_x, button_y, button_w, button_h)
             )
             if click[0] == 1:
-                sun.orbit = []
+                for planet in planets:
+                    planet.reset()
+                '''sun.orbit = []
                 sun.x, sun.y = 0, 0
                 sun.x_vel = 0
                 sun.y_vel = 0
@@ -265,10 +299,14 @@ def main():
                 neptune.orbit = []
                 neptune.x = 30 * Planet.AU
                 neptune.y = 0
-                neptune.x_vel = 0
+                neptune.x_vel = 0'''
 
                 global frames
                 frames = 0
+
+                global TIMESTEP
+                TIMESTEP = (3600 * 24)
+
                 if black_hole in planets:
                     black_hole.x_vel = 0
                     black_hole.y_vel = -6 * 1000
@@ -383,6 +421,46 @@ def main():
         # x = self.x * self.SCALE + WIDTH / 2
 
     #        x - width/2    /    self.SCALE = self.x
+
+
+    def speed_up_button(
+        msg,
+        button_x,
+        button_y,
+        button_w,
+        button_h,
+        inactive_color,
+        active_color,
+        add_planet=None,
+    ):
+        global TIMESTEP
+        mouse = pygame.mouse.get_pos()
+        click = pygame.mouse.get_pressed()
+
+        if (
+
+            button_x + button_w > mouse[0] > button_x
+            and button_y + button_h > mouse[1] > button_y
+        ):
+            pygame.draw.rect(
+                WIN, active_color, (button_x, button_y, button_w, button_h)
+            )
+
+            if click[0] == 1:
+                paused()
+                TIMESTEP = TIMESTEP * 2
+                for planet in planets:
+                    planet.update_timestep(new_timestep=TIMESTEP)
+
+        else:
+            pygame.draw.rect(
+                WIN, inactive_color, (button_x, button_y, button_w, button_h)
+            )
+
+        button_text = FONT.render(msg, True, BLACK)
+        textRect = button_text.get_rect()
+        textRect.center = ((button_x + (button_w / 2)), (button_y + (button_h / 2)))
+        WIN.blit(button_text, textRect)
 
     def pause_button(
         msg, button_x, button_y, button_w, button_h, inactive_color, active_color
@@ -540,6 +618,8 @@ def main():
         )
 
         place_planet_button("Place BH", 25 * SCREEN_CHANGE_RATIO_W, 450 * SCREEN_CHANGE_RATIO_H, BUTTON_WIDTH, BUTTON_HEIGHT, WHITE, YELLOW)
+
+        speed_up_button(">>", 25 * SCREEN_CHANGE_RATIO_W, 670 * SCREEN_CHANGE_RATIO_H, BUTTON_WIDTH, BUTTON_HEIGHT, YELLOW, RED)
 
         pause_button("Pause", 25 * SCREEN_CHANGE_RATIO_W, 730 * SCREEN_CHANGE_RATIO_H, BUTTON_WIDTH, BUTTON_HEIGHT, YELLOW, RED)
         reset_button("Reset", 25 * SCREEN_CHANGE_RATIO_W, 790 * SCREEN_CHANGE_RATIO_H, BUTTON_WIDTH, BUTTON_HEIGHT, RED, RED)
