@@ -537,8 +537,7 @@ def main():
         pause = True
 
         while pause:
-            mouse = pygame.mouse.get_pos()
-            click = pygame.mouse.get_pressed()
+
             for event in pygame.event.get():
 
                 if event.type == pygame.QUIT:
@@ -552,7 +551,7 @@ def main():
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     pause = False
 
-            resume_button("Resume", 200, 730, 100, 50, RED, YELLOW)
+            resume_button("Paused", 200 * BUTTON_WIDTH_RATIO, 730 * BUTTON_HEIGHT_RATIO, BUTTON_WIDTH, BUTTON_HEIGHT, RED, YELLOW)
 
             for planet in planets:
                 planet.draw(WIN)
