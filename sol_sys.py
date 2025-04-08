@@ -1,5 +1,5 @@
 import pygame
-from planet import Planet
+from planet import *
 from static import *
 
 pygame.init()
@@ -12,11 +12,7 @@ pygame.init()
 # add acceleration vector arrow to see orbit disturbance better!
 # Should I zoom in?
 
-WIN = pygame.display.set_mode(
-    (WIDTH, HEIGHT), flags=pygame.RESIZABLE
-)  
-pygame.display.set_caption("sol_sys")
-FONT = pygame.font.SysFont("comic sans", 15)
+
 
 
 def main():
@@ -107,8 +103,9 @@ def main():
                 global frames
                 frames = 0
 
-                global TIMESTEP
+                global TIMESTEP, TIMESTEP_MULTIPLIER
                 TIMESTEP = (3600 * 24)
+                TIMESTEP_MULTIPLIER = 1
 
                 
 
