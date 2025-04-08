@@ -5,7 +5,8 @@ current_window_w, current_window_h = WIDTH, HEIGHT
 SCREEN_CHANGE_RATIO_W, SCREEN_CHANGE_RATIO_H = 1, 1
 
 #Object Names
-planets = ()
+planets = []
+OBJECT_TO_PLACE = {}
 PLACEABLE_OBJECT_NAMES = ("BH", "Jupiter 2.0", "Sun 2.0")
 
 #Colors

@@ -79,7 +79,7 @@ def main():
     )
 
     #   main() iterates through this list of objects and updates each position. optional objects get entered here when clicked
-    planets = (sun, earth, mars, mercury, venus, jupiter, saturn, uranus, neptune)
+    planets = [sun, earth, mars, mercury, venus, jupiter, saturn, uranus, neptune]
 
     def reset_button(
         msg, button_x, button_y, button_w, button_h, inactive_color, active_color
@@ -228,7 +228,11 @@ def main():
             )
 
             if click[0] == 1:
+                global OBJECT_TO_PLACE
                 place_active = True
+                OBJECT_TO_PLACE = Planet(
+                    5 * Planet.AU, 5 * Planet.AU, 3, WHITE, 10 * sun.mass, "BH"
+                )
 
         else:
             pygame.draw.rect(
@@ -241,7 +245,7 @@ def main():
         WIN.blit(button_text, textRect)
 
     # update user object
-    def update_object():
+    def place_user_object(user_object):
         global place_active
         mouse = pygame.mouse.get_pos()
         user_object.x = (mouse[0] - (WIDTH / 2)) / Planet.SCALE
@@ -507,7 +511,7 @@ def main():
                 run = False
 
             if event.type == pygame.MOUSEBUTTONDOWN and place_active == True:
-                update_object()
+                place_user_object(OBJECT_TO_PLACE)
 
             if event.type == pygame.VIDEORESIZE:
                 current_window_w, current_window_h = pygame.display.get_surface().get_size()
