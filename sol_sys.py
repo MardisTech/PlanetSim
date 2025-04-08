@@ -63,7 +63,7 @@ def main():
 
     #   optional objects that user can choose to add to game by clicking the corresponding button
     black_hole = Planet(
-        15 * Planet.AU, 20 * Planet.AU, 2, WHITE, 5 * sun.mass, "Black Hole", y_vel = -6 * 1000
+        15 * Planet.AU, 20 * Planet.AU, 2, WHITE, 5 * sun.mass, "BH", y_vel = -6 * 1000
     )
     black_hole.y_vel = -6 * 1000
 
@@ -100,94 +100,17 @@ def main():
             if click[0] == 1:
                 for planet in planets:
                     planet.reset()
-                '''sun.orbit = []
-                sun.x, sun.y = 0, 0
-                sun.x_vel = 0
-                sun.y_vel = 0
+                    if planet.name in PLACEABLE_OBJECT_NAMES:
+                        planets.remove(planet)
 
-                earth.y_vel = 29.783 * 1000
-                earth.orbit = []
-                earth.x = -1 * Planet.AU
-                earth.y = 0
-                earth.x_vel = 0
-
-                mars.y_vel = 24.077 * 1000
-                mars.orbit = []
-                mars.x = -1.524 * Planet.AU
-                mars.y = 0
-                mars.x_vel = 0
-
-                mercury.y_vel = -47.4 * 1000
-                mercury.orbit = []
-                mercury.x = 0.387 * Planet.AU
-                mercury.y = 0
-                mercury.x_vel = 0
-
-                venus.y_vel = -35.02 * 1000
-                venus.orbit = []
-                venus.x = 0.723 * Planet.AU
-                venus.y = 0
-                venus.x_vel = 0
-
-                jupiter.y_vel = 13.07 * 1000
-                jupiter.orbit = []
-                jupiter.x = -5.2 * Planet.AU
-                jupiter.y = 0
-                jupiter.x_vel = 0
-
-                saturn.y_vel = -9.68 * 1000
-                saturn.orbit = []
-                saturn.x = 9.5 * Planet.AU
-                saturn.y = 0
-                saturn.x_vel = 0
-
-                uranus.y_vel = 6.8 * 1000
-                uranus.orbit = []
-                uranus.x = -19.8 * Planet.AU
-                uranus.y = 0
-                uranus.x_vel = 0
-
-                neptune.y_vel = -5.43 * 1000
-                neptune.orbit = []
-                neptune.x = 30 * Planet.AU
-                neptune.y = 0
-                neptune.x_vel = 0'''
-
+                
                 global frames
                 frames = 0
 
                 global TIMESTEP
                 TIMESTEP = (3600 * 24)
 
-                if black_hole in planets:
-                    black_hole.x_vel = 0
-                    black_hole.y_vel = -6 * 1000
-                    black_hole.x = 15 * Planet.AU
-                    black_hole.y = 20 * Planet.AU
-                    black_hole.orbit = []
-                    planets.remove(black_hole)
-
-                if second_sun in planets:
-                    second_sun.x_vel = 0
-                    second_sun.y_vel = -6 * 1000
-                    second_sun.x = 15 * Planet.AU
-                    second_sun.y = 20 * Planet.AU
-                    second_sun.orbit = []
-                    planets.remove(second_sun)
-
-                if second_jupiter in planets:
-                    second_jupiter.x_vel = 0
-                    second_jupiter.y_vel = -6 * 1000
-                    second_jupiter.x = 15 * Planet.AU
-                    second_jupiter.y = 20 * Planet.AU
-                    second_jupiter.orbit = []
-                    planets.remove(second_jupiter)
-
-                if user_object in planets:
-                    user_object.orbit = []
-                    user_object.x_vel = 0
-                    user_object.y_vel = 0
-                    planets.remove(user_object)
+                
 
         else:
             pygame.draw.rect(
@@ -542,11 +465,6 @@ def main():
 
                 SCREEN_CHANGE_RATIO_H = current_window_h / HEIGHT
 
-
-
-
-
-        # draw the planets updrated positions and velocidies every frame
         for planet in planets:
             planet.update_position(planets)
             planet.draw(WIN)

@@ -4,6 +4,9 @@ WIDTH, HEIGHT = 1600, 1000
 current_window_w, current_window_h = WIDTH, HEIGHT
 SCREEN_CHANGE_RATIO_W, SCREEN_CHANGE_RATIO_H = 1, 1
 
+#Object Names
+PLACEABLE_OBJECT_NAMES = ("BH", "Jupiter 2.0", "Sun 2.0")
+
 #Colors
 WHITE =(255, 255, 255)
 YELLOW = (255, 255, 0)
