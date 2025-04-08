@@ -258,7 +258,7 @@ def main():
 
             if click[0] == 1:
                 paused()
-                TIMESTEP_MULTIPLIER = 1/2
+                TIMESTEP_MULTIPLIER = TIMESTEP_MULTIPLIER / 2
                 TIMESTEP = TIMESTEP*TIMESTEP_MULTIPLIER
                 for planet in planets:
                     planet.update_timestep(new_timestep=TIMESTEP)
@@ -440,8 +440,8 @@ def main():
 
 
         global frames, place_active
-        frames += 1
-        timeElapsedBox(frames*TIMESTEP_MULTIPLIER)
+        frames += TIMESTEP_MULTIPLIER
+        timeElapsedBox(frames)
 
         # event listeners
         for event in pygame.event.get():
