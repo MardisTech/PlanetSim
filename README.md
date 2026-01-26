@@ -1,6 +1,6 @@
 # Getting Started for windows
 
-Download and run sol_sys.exe
+1. Clone the repository and run sol_sys.exe
 
 # Creating a distributable
 

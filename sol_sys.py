@@ -502,7 +502,7 @@ def main():
 
 
         global frames, place_active
-        frames += TIMESTEP_MULTIPLIER
+        frames += TIMESTEP_MULTIPLIER 
         timeElapsedBox(frames)
 
         # event listeners
