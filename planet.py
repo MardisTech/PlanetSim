@@ -1,6 +1,7 @@
 from static import *
 import math 
 import pygame
+from collections import deque
 
 pygame.init()
 
@@ -14,6 +15,7 @@ class Planet:
     AU = 149.6e6 * 1000
     G = 6.67428e-11
     SCALE = 25 / AU  # 1 AU = 100 PIXELS @  250 / AU
+    MAX_ORBIT_POINTS = 500  # Maximum number of points to keep in the orbit list
 
     global TIMESTEP
 
@@ -29,9 +31,7 @@ class Planet:
         self.distance_to_sun = 0
         self.x_vel = x_vel
         self.y_vel = y_vel
-        self.orbit = (
-            []
-        )  # this is a list of x,y position values for each frame for each planet so we can draw the planet and calculate distance from other planets through the pixel/distance ratio
+        self.orbit = deque(maxlen=self.MAX_ORBIT_POINTS)  # Use deque for efficient orbit management
 
         self.x0 = x
         self.y0 = y
@@ -73,13 +73,10 @@ class Planet:
         y = self.y * self.SCALE + HEIGHT / 2
 
         if len(self.orbit) > 2:
-            updated_points = []
-            for point in self.orbit:
-                x, y = point
-                x = x * self.SCALE + WIDTH / 2
-                y = y * self.SCALE + HEIGHT / 2
-                updated_points.append((x, y))
-
+            updated_points = [
+                (point[0] * self.SCALE + WIDTH / 2, point[1] * self.SCALE + HEIGHT / 2)
+                for point in self.orbit
+            ]
             pygame.draw.lines(win, self.color, False, updated_points, 2)
 
         if not self.sun:
@@ -132,4 +129,5 @@ class Planet:
 
         self.x += self.x_vel * self.TIMESTEP  # X = V * T
         self.y += self.y_vel * self.TIMESTEP
-        self.orbit.append((self.x, self.y))
+        self.orbit.append((self.x, self.y))  # Automatically handles maxlen with deque
+

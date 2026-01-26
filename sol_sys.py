@@ -4,16 +4,6 @@ from static import *
 
 pygame.init()
 
-# julie wants to zoom in
-# add custom object input for place button
-# look into hooking in nasa API for real initial positions when launched instead of initializing on x axis
-# add planet info box - user will be able to inspect an object to see its velocity and other props
-# add a slow or fastforward frames/sim option, possibly a rewind option that draws from reversed list of orbit
-# add acceleration vector arrow to see orbit disturbance better!
-# Should I zoom in?
-
-
-
 
 def main():
     run = True
@@ -252,9 +242,6 @@ def main():
         user_object.y = (mouse[1] - (HEIGHT / 2)) / Planet.SCALE
         planets.append(user_object)
         place_active = False
-        # x = self.x * self.SCALE + WIDTH / 2
-
-    #        x - width/2    /    self.SCALE = self.x
 
 
     def speed_up_button(
